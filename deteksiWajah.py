@@ -1,35 +1,49 @@
 import face_recognition
 from mysql import connector as mysql
-import cv2
 import koneksi
+from flask import jsonify
 
-def deteksi(id, photo):
-    id = 1
-    # inputFileImage= "face/ref_1.jpg"
-
+def deteksi(photo,imgDb):
+    inputFileImage= "face/"+imgDb
     referImage = face_recognition.load_image_file(photo)
-    inputImage = face_recognition.load_image_file(photo)
+    inputImage = face_recognition.load_image_file(inputFileImage)
 
-    referEncode = face_recognition.face_encodings(referImage)[0]
-    inputEncode = face_recognition.face_encodings(inputImage)[0]
+    try:
+        referEncode = face_recognition.face_encodings(referImage)[0]
+    except IndexError as e:
+        pass
+
+
+    try:
+        inputEncode = face_recognition.face_encodings(inputImage)[0]
+    except IndexError as e:
+        return jsonify('Wajah tidak terdeteksi')
 
     results = face_recognition.compare_faces([referEncode], inputEncode)
 
-    results[0]
+    return results[0]
 
-def tes():
-    text =[]
+
+def proses(id,file):
+
     con = koneksi.konek()
 
-    con.mycursor.execute("SELECT * FROM orang")
-
+    con.mycursor.execute("SELECT * FROM orang where id=" + id)
+    
     myresult = con.mycursor.fetchall()
-    for x in myresult:
+    response = False
+    nama =''
+    for data in myresult:
+        nama = data[1]
+        cekWajah = deteksi(file,data[2])
+        if cekWajah:
+            response = True
+            break
+        else:
+            response = False
+    return [response,nama]
 
-        text.append(x)
 
-    print(text)
-    return text
 
 if __name__ == "__main__":
-    tes()
+    proses()
