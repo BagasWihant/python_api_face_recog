@@ -10,4 +10,5 @@
   - pip install cmake
   - pip install dlib
   - pip install face_recognition
+  - pip install mysql_connector_python
 
