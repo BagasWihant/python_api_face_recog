@@ -36,7 +36,6 @@ def proses(id,file):
     for data in myresult:
         nama = data[1]
         cekWajah = deteksi(file,data[2])
-        print(cekWajah)
         if cekWajah:
             response = True
             break
